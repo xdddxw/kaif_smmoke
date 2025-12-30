@@ -176,7 +176,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  // Ваші дані з скріншоту
   const firebaseConfig = {
     databaseURL: "https://smokehub-7a072-default-rtdb.firebaseio.com/" 
   };
@@ -185,47 +184,43 @@
   const db = getDatabase(app);
   const catalogRef = ref(db, 'catalog');
 
-  // Оновлення цін у всіх клієнтів в реальному часі
   onValue(catalogRef, (snapshot) => {
     const data = snapshot.val();
     if (data) {
         const prices = document.querySelectorAll('.price');
         const descs = document.querySelectorAll('.product-desc');
-        
-        if(data.prices) {
-            data.prices.forEach((val, i) => { if(prices[i]) prices[i].innerText = val; });
-        }
-        if(data.descs) {
-            data.descs.forEach((val, i) => { if(descs[i]) descs[i].innerText = val; });
-        }
+        if(data.prices) data.prices.forEach((val, i) => { if(prices[i]) prices[i].innerText = val; });
+        if(data.descs) data.descs.forEach((val, i) => { if(descs[i]) descs[i].innerText = val; });
     }
   });
 
-  // Функція збереження для адмін-панелі
   window.saveToFirebase = function() {
     const pricesData = Array.from(document.querySelectorAll('.price')).map(el => el.innerText);
     const descsData = Array.from(document.querySelectorAll('.product-desc')).map(el => el.innerText);
-
-    set(catalogRef, {
-      prices: pricesData,
-      descs: descsData
-    })
-    .then(() => alert("Дані синхронізовано для всіх! ✅"))
+    set(catalogRef, { prices: pricesData, descs: descsData })
+    .then(() => alert("Дані синхронізовано! ✅"))
     .catch((err) => alert("Помилка: " + err));
   }
 </script>
 
 <script>
-// Логіка адмінки (пароль залиште свій)
 const ADMIN = { user: "admin", pass: "admin" };
 
-function openDevAuth() {
+// Функція відкриття/закриття панелей
+window.openDevAuth = function() {
     if (sessionStorage.getItem('isHubAdmin') === 'true') {
         document.getElementById('dev-menu').classList.add('active');
-    } else { document.getElementById('dev-login').classList.add('active'); }
+    } else { 
+        document.getElementById('dev-login').classList.add('active'); 
+    }
 }
 
-function checkDevAuth() {
+window.closeAllPanels = function() {
+    document.getElementById('dev-login').classList.remove('active');
+    document.getElementById('dev-menu').classList.remove('active');
+}
+
+window.checkDevAuth = function() {
     const u = document.getElementById('dev-user').value;
     const p = document.getElementById('dev-pass').value;
     if (u === ADMIN.user && p === ADMIN.pass) {
@@ -235,8 +230,13 @@ function checkDevAuth() {
     } else { alert("Відмовлено"); }
 }
 
+window.devLogout = function() {
+    sessionStorage.removeItem('isHubAdmin'); // Видаляємо статус адміна
+    closeAllPanels(); // Ховаємо панель
+}
+
 let editMode = { price: false, desc: false };
-function toggleEdit(type) {
+window.toggleEdit = function(type) {
     editMode[type] = !editMode[type];
     const selector = type === 'price' ? '.price' : '.product-desc';
     const elements = document.querySelectorAll(selector);
@@ -261,7 +261,7 @@ const menu = document.getElementById('mobileMenu');
 if (openBtn) openBtn.onclick = () => menu.classList.add('active');
 if (closeBtn) closeBtn.onclick = () => menu.classList.remove('active');
 
-function toggleCategory(cat) {
+window.toggleCategory = function(cat) {
     ['zalivka', 'prodazh', 'aktsii'].forEach(t => {
         document.getElementById('cat-' + t).classList.toggle('hidden', t !== cat);
         document.getElementById('btn-' + t).classList.toggle('active', t === cat);
@@ -270,4 +270,5 @@ function toggleCategory(cat) {
 document.addEventListener('keydown', (e) => { if (e.shiftKey && e.code === 'KeyD') openDevAuth(); });
 </script>
 </body>
+
 </html>
