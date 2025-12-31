@@ -195,15 +195,26 @@ h1 {
 
 <!-- ===== ❄️ Сніг ===== -->
 <script>
-for(let i=0;i<20;i++){
+for(let i=0;i<25;i++){
   let s = document.createElement("div");
   s.className = "snowflake";
   s.innerHTML = "❄️";
-  s.style.left = Math.random()*100 + "vw";
-  s.style.animationDuration = (6 + Math.random()*10) + "s";
-  s.style.fontSize = (10 + Math.random()*16) + "px";
+
+  // Випадкова позиція по X
+  s.style.left = Math.random() * 100 + "vw";
+
+  // Випадкова стартова позиція по Y, щоб сніг не "підстрибував"
+  s.style.top = Math.random() * 100 + "vh";
+
+  // Випадкова швидкість падіння
+  s.style.animationDuration = (5 + Math.random() * 10) + "s";
+
+  // Випадковий розмір сніжинки
+  s.style.fontSize = (10 + Math.random() * 20) + "px";
+
   document.body.appendChild(s);
 }
+
 </script>
 
 <!-- ===== КОНТЕЙНЕР ОПЛАТИ ===== -->
@@ -251,3 +262,4 @@ function copyNumber(text){
 
 </body>
 </html>
+
